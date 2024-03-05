@@ -6,6 +6,10 @@ contract UserManager {
 
     mapping(address => Role) private roles;
 
+    constructor(){
+        addUser(msg.sender, Role.Administrator);
+    }
+
     // Ensure only an administrator can perform certain actions
     modifier onlyAdministrator() {
         require(roles[msg.sender] == Role.Administrator, "Not an administrator");
@@ -18,7 +22,7 @@ contract UserManager {
         _;
     }
 
-    function addUser(address user, Role role) private onlyAdministrator {
+    function addUser(address user, Role role) public onlyAdministrator {
         roles[user] = role;
     }
 
@@ -87,7 +91,7 @@ contract LoanSystem is FinancialOperations {
         delete loans[msg.sender];
     }
 
-    function calculateTotalDebt(address borrower) public view returns (uint256) {
+    function calculateTotalDebt(address borrower) private view returns (uint256) {
         Loan storage loan = loans[borrower];
         uint256 interest = (loan.principal * loan.interestRateBasisPoints) / 10000;
         return loan.principal + interest;
